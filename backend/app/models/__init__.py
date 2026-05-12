@@ -12,6 +12,8 @@ from app.models.process import Process, CCPStandard
 from app.models.equipment import Equipment
 from app.models.customer import Customer
 from app.models.common_code import CommonCode
+from app.models.order import Order, OrderDetail, OrderHistory
+from app.models.production import ProductionPlan, WorkOrder, WorkOrderResult, QCRecord
 
 __all__ = [
     "TimestampMixin",
@@ -27,4 +29,11 @@ __all__ = [
     "Equipment",
     "Customer",
     "CommonCode",
+    "Order",
+    "OrderDetail",
+    "OrderHistory",
+    "ProductionPlan",
+    "WorkOrder",
+    "WorkOrderResult",
+    "QCRecord",
 ]

@@ -72,7 +72,13 @@ try:
         process,
         equipment,
         customer,
+        order,
+        production,
     )
+
+    # Sprint 2 모델 명시적 임포트 (Alembic 자동 감지 보장)
+    from app.models.order import Order, OrderDetail, OrderHistory  # noqa: F401
+    from app.models.production import ProductionPlan, WorkOrder, WorkOrderResult, QCRecord  # noqa: F401
 
     target_metadata = Base.metadata
 except ImportError:

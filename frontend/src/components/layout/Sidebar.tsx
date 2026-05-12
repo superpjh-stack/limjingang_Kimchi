@@ -19,6 +19,7 @@ import {
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
   BuildingStorefrontIcon,
+  DeviceTabletIcon,
 } from '@heroicons/react/24/outline'
 
 interface MenuItem {
@@ -26,6 +27,7 @@ interface MenuItem {
   href?: string
   icon: React.ElementType
   children?: { label: string; href: string }[]
+  external?: boolean
 }
 
 const menuItems: MenuItem[] = [
@@ -75,6 +77,12 @@ const menuItems: MenuItem[] = [
     label: '품질관리',
     href: '/quality',
     icon: BuildingStorefrontIcon,
+  },
+  {
+    label: 'POP 현장작업',
+    href: '/pop',
+    icon: DeviceTabletIcon,
+    external: true,
   },
   {
     label: 'KPI모니터링',
@@ -191,6 +199,8 @@ export default function Sidebar() {
               <li key={item.label}>
                 <Link
                   href={item.href!}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium',
                     'transition-colors duration-150',
@@ -201,6 +211,22 @@ export default function Sidebar() {
                 >
                   <Icon className="h-5 w-5 flex-shrink-0" />
                   <span>{item.label}</span>
+                  {item.external && (
+                    <svg
+                      className="ml-auto h-3.5 w-3.5 opacity-60"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                      />
+                    </svg>
+                  )}
                 </Link>
               </li>
             )
