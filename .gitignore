@@ -1,5 +1,31 @@
-﻿*.py
-__pycache__/
+﻿__pycache__/
 *.pyc
+*.pyo
+*.pyd
 docs/.bkit-memory.json
 docs/.pdca-status.json
+
+# 환경변수 (비밀정보)
+.env
+!.env.example
+
+# Python
+*.py.bak
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Node.js
+node_modules/
+.next/
+out/
+frontend/.env.local
+
+# 로그
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
