@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import NumericInput from '@/components/pop/NumericInput'
 import { processRecordApi, inventoryApi } from '@/lib/api'
 

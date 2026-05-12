@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import { kpiApi } from '@/lib/api'
 import type { ProductionKpi, OrderKpi, InventoryKpi } from '@/types/kpi'
 import PageHeader from '@/components/layout/PageHeader'

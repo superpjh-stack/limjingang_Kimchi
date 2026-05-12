@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import { kpiApi } from '@/lib/api'
 import type { InventoryKpi } from '@/types/kpi'
 import { cn } from '@/lib/utils'

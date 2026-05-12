@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useQuery, useMutation, useQueryClient } from 'react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { popApi } from '@/lib/api'
 import StatusDisplay from '@/components/pop/StatusDisplay'
 import ResultForm from '@/components/pop/ResultForm'

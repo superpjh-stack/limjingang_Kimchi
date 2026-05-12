@@ -14,7 +14,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import { kpiApi } from '@/lib/api'
 import type { OrderKpi } from '@/types/kpi'
 import { formatCurrency } from '@/lib/utils'

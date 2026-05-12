@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useQuery, useMutation, useQueryClient } from 'react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { popApi } from '@/lib/api'
 import WorkOrderCard from '@/components/pop/WorkOrderCard'
