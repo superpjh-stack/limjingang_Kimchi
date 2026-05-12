@@ -10,6 +10,7 @@ from app.models.bom import BOM, BOMDetail
 from app.models.raw_material import RawMaterial
 from app.models.process import Process, CCPStandard
 from app.models.equipment import Equipment
+from app.models.equipment_ext import EquipmentInspection, EquipmentFailure
 from app.models.customer import Customer
 from app.models.common_code import CommonCode
 from app.models.order import Order, OrderDetail, OrderHistory
@@ -36,6 +37,8 @@ __all__ = [
     "Process",
     "CCPStandard",
     "Equipment",
+    "EquipmentInspection",
+    "EquipmentFailure",
     "Customer",
     "CommonCode",
     "Order",

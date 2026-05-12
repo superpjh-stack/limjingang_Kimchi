@@ -17,6 +17,9 @@ from app.api.v1.endpoints import (
     inventory,
     shipments,
     kpi,
+    cold_storage,
+    equipment_ext,
+    admin,
 )
 
 api_router = APIRouter()
@@ -42,3 +45,12 @@ api_router.include_router(work_orders.router, prefix="/work-orders", tags=["작�
 api_router.include_router(inventory.router, prefix="/inventory", tags=["재고관리"])
 api_router.include_router(shipments.router, prefix="/shipments", tags=["출하관리"])
 api_router.include_router(kpi.router, prefix="/kpi", tags=["KPI"])
+
+# Sprint 4 - 숙성냉장관리 엔드포인트
+api_router.include_router(cold_storage.router, prefix="/cold-storage", tags=["숙성냉장관리"])
+
+# Sprint 4 - 설비 확장(점검·고장) 엔드포인트
+api_router.include_router(equipment_ext.router, prefix="/equipment", tags=["설비관리 확장"])
+
+# Sprint 4 - 시스템관리 엔드포인트
+api_router.include_router(admin.router, prefix="/admin", tags=["시스템관리"])

@@ -175,3 +175,62 @@ export const shipmentApi = {
   ship: (id: number) => api.post(`/shipments/${id}/ship`),
   deliver: (id: number) => api.post(`/shipments/${id}/deliver`),
 }
+
+// Equipment Extended API — Sprint 4 점검/고장 관리
+export const equipmentExtApi = {
+  getInspections: (equipmentId: number, params?: Record<string, unknown>) =>
+    api.get(`/equipment/${equipmentId}/inspections`, { params }),
+  createInspection: (equipmentId: number, data: Record<string, unknown>) =>
+    api.post(`/equipment/${equipmentId}/inspections`, data),
+  updateInspection: (inspectionId: number, data: Record<string, unknown>) =>
+    api.put(`/equipment/inspections/${inspectionId}`, data),
+  getOverdueInspections: () => api.get('/equipment/inspections/overdue'),
+  getUpcomingInspections: () => api.get('/equipment/inspections/upcoming'),
+  getFailures: (equipmentId: number, params?: Record<string, unknown>) =>
+    api.get(`/equipment/${equipmentId}/failures`, { params }),
+  createFailure: (equipmentId: number, data: Record<string, unknown>) =>
+    api.post(`/equipment/${equipmentId}/failures`, data),
+  resolveFailure: (failureId: number, data: Record<string, unknown>) =>
+    api.post(`/equipment/failures/${failureId}/resolve`, data),
+  getOpenFailures: () => api.get('/equipment/failures/open'),
+  updateStatus: (equipmentId: number, data: Record<string, unknown>) =>
+    api.put(`/equipment/${equipmentId}/status`, data),
+}
+
+// Cold Storage API — Sprint 4 숙성냉장관리
+export const coldStorageApi = {
+  getStatus: () => api.get('/cold-storage/status'),
+  getTrend: (warehouseCode: string, period = '24h') =>
+    api.get(`/cold-storage/${warehouseCode}/trend`, { params: { period } }),
+  getAlarms: (hours = 24, warehouseCode?: string) =>
+    api.get('/cold-storage/alarms', {
+      params: { hours, ...(warehouseCode ? { warehouse_code: warehouseCode } : {}) },
+    }),
+  writeSensorData: (data: {
+    warehouse_code: string
+    sensor_type: string
+    value: number
+    unit?: string
+  }) => api.post('/cold-storage/sensor-data', data),
+  simulate: () => api.post('/cold-storage/simulate'),
+}
+
+// Admin API — Sprint 4 시스템관리
+export const adminApi = {
+  getUsers: (params?: Record<string, unknown>) => api.get('/admin/users', { params }),
+  createUser: (data: Record<string, unknown>) => api.post('/admin/users', data),
+  updateUser: (id: number, data: Record<string, unknown>) => api.put(`/admin/users/${id}`, data),
+  resetPassword: (id: number) => api.post(`/admin/users/${id}/reset-password`),
+  toggleUserStatus: (id: number, data: Record<string, unknown>) =>
+    api.put(`/admin/users/${id}/status`, data),
+  getRoles: () => api.get('/admin/roles'),
+  assignRole: (userId: number, data: Record<string, unknown>) =>
+    api.post(`/admin/users/${userId}/roles`, data),
+  getCommonCodes: (params?: Record<string, unknown>) =>
+    api.get('/admin/common-codes', { params }),
+  createCommonCode: (data: Record<string, unknown>) => api.post('/admin/common-codes', data),
+  updateCommonCode: (id: number, data: Record<string, unknown>) =>
+    api.put(`/admin/common-codes/${id}`, data),
+  deleteCommonCode: (id: number) => api.delete(`/admin/common-codes/${id}`),
+  getCodeGroups: () => api.get('/admin/common-codes/groups'),
+}

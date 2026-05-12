@@ -22,6 +22,7 @@ import {
   DeviceTabletIcon,
   TruckIcon,
   ShieldCheckIcon,
+  ArchiveBoxIcon,
 } from '@heroicons/react/24/outline'
 
 interface MenuItem {
@@ -92,6 +93,11 @@ const menuItems: MenuItem[] = [
     external: true,
   },
   {
+    label: '숙성냉장관리',
+    href: '/cold-storage',
+    icon: ArchiveBoxIcon,
+  },
+  {
     label: 'KPI모니터링',
     href: '/kpi',
     icon: ChartBarIcon,
@@ -108,8 +114,11 @@ const menuItems: MenuItem[] = [
   },
   {
     label: '시스템관리',
-    href: '/system',
     icon: Cog6ToothIcon,
+    children: [
+      { label: '사용자관리', href: '/admin/users' },
+      { label: '공통코드', href: '/admin/common-codes' },
+    ],
   },
 ]
 
