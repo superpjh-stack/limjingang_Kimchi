@@ -16,7 +16,7 @@ WORKDIR /app
 
 # 의존성 파일 복사 및 설치 (레이어 캐시 활용)
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 # 소스코드 복사
 # 개발 환경에서는 docker-compose volumes 마운트로 덮어쓰여짐

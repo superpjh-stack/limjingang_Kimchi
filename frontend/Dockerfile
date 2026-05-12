@@ -4,9 +4,6 @@
 # ─────────────────────────────────────────
 FROM node:20-alpine
 
-# 시스템 패키지 설치
-RUN apk add --no-cache curl
-
 WORKDIR /app
 
 # 패키지 파일 복사 및 의존성 설치 (레이어 캐시 활용)
@@ -23,7 +20,7 @@ EXPOSE 3000
 
 # 헬스체크
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:3000 || exit 1
+    CMD wget -q --spider http://localhost:3000 || exit 1
 
 # 개발 모드 실행 (Next.js Fast Refresh 활성화)
 CMD ["npm", "run", "dev"]
