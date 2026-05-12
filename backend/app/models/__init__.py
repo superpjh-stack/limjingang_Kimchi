@@ -14,6 +14,15 @@ from app.models.customer import Customer
 from app.models.common_code import CommonCode
 from app.models.order import Order, OrderDetail, OrderHistory
 from app.models.production import ProductionPlan, WorkOrder, WorkOrderResult, QCRecord
+from app.models.inventory import (
+    Warehouse,
+    MaterialReceive,
+    MaterialStock,
+    MaterialTransaction,
+    ProductStock,
+    Shipment,
+    ShipmentDetail,
+)
 
 __all__ = [
     "TimestampMixin",
@@ -36,4 +45,11 @@ __all__ = [
     "WorkOrder",
     "WorkOrderResult",
     "QCRecord",
+    "Warehouse",
+    "MaterialReceive",
+    "MaterialStock",
+    "MaterialTransaction",
+    "ProductStock",
+    "Shipment",
+    "ShipmentDetail",
 ]

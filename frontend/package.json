@@ -23,7 +23,8 @@
     "react-query": "^3.39.3",
     "js-cookie": "^3.0.5",
     "@types/js-cookie": "^3.0.6",
-    "clsx": "^2.1.1"
+    "clsx": "^2.1.1",
+    "recharts": "^2.12.0"
   },
   "devDependencies": {
     "typescript": "^5",

@@ -20,6 +20,8 @@ import {
   UserCircleIcon,
   BuildingStorefrontIcon,
   DeviceTabletIcon,
+  TruckIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline'
 
 interface MenuItem {
@@ -59,8 +61,8 @@ const menuItems: MenuItem[] = [
     label: '자재/재고',
     icon: CubeIcon,
     children: [
-      { label: '입고등록', href: '/inventory/receiving' },
-      { label: '재고현황', href: '/inventory/status' },
+      { label: '원자재 재고', href: '/inventory/materials' },
+      { label: '완제품 재고', href: '/inventory/products' },
     ],
   },
   {
@@ -74,9 +76,14 @@ const menuItems: MenuItem[] = [
     ],
   },
   {
+    label: '출하관리',
+    href: '/shipments',
+    icon: TruckIcon,
+  },
+  {
     label: '품질관리',
     href: '/quality',
-    icon: BuildingStorefrontIcon,
+    icon: ShieldCheckIcon,
   },
   {
     label: 'POP 현장작업',

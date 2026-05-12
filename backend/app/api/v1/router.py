@@ -14,6 +14,9 @@ from app.api.v1.endpoints import (
     orders,
     production_plans,
     work_orders,
+    inventory,
+    shipments,
+    kpi,
 )
 
 api_router = APIRouter()
@@ -34,3 +37,8 @@ api_router.include_router(common_codes.router, prefix="/common-codes", tags=["�
 api_router.include_router(orders.router, prefix="/orders", tags=["수주관리"])
 api_router.include_router(production_plans.router, prefix="/production-plans", tags=["생산계획"])
 api_router.include_router(work_orders.router, prefix="/work-orders", tags=["작업지시"])
+
+# Sprint 3 - 재고·출하·KPI 엔드포인트
+api_router.include_router(inventory.router, prefix="/inventory", tags=["재고관리"])
+api_router.include_router(shipments.router, prefix="/shipments", tags=["출하관리"])
+api_router.include_router(kpi.router, prefix="/kpi", tags=["KPI"])

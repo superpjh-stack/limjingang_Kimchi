@@ -117,6 +117,16 @@ export const workOrderApi = {
   getById: (id: number) => api.get(`/work-orders/${id}`),
 }
 
+// KPI API — Sprint 3 대시보드
+export const kpiApi = {
+  getDashboard: () => api.get('/kpi/dashboard'),
+  getProduction: (params: { date_from: string; date_to: string }) =>
+    api.get('/kpi/production', { params }),
+  getOrders: (params: { date_from: string; date_to: string }) =>
+    api.get('/kpi/orders', { params }),
+  getInventory: () => api.get('/kpi/inventory'),
+}
+
 // POP API — 현장 작업자 태블릿 전용
 export const popApi = {
   getTodayWorkOrders: () =>
@@ -133,4 +143,35 @@ export const popApi = {
     api.post(`/work-orders/${id}/results`, data),
   recordQc: (id: number, data: QcInput) =>
     api.post(`/work-orders/${id}/qc`, data),
+}
+
+// Inventory API
+export const inventoryApi = {
+  getMaterialStock: (params?: Record<string, unknown>) =>
+    api.get('/inventory/material-stock', { params }),
+  getMaterialStockDetail: (params?: Record<string, unknown>) =>
+    api.get('/inventory/material-stock/detail', { params }),
+  receiveMaterial: (data: Record<string, unknown>) =>
+    api.post('/inventory/material-receive', data),
+  getReceiveList: (params?: Record<string, unknown>) =>
+    api.get('/inventory/material-receive', { params }),
+  updateQcStatus: (id: number, data: { qc_status: string; qc_notes?: string }) =>
+    api.put(`/inventory/material-receive/${id}/qc`, data),
+  issueMaterial: (data: Record<string, unknown>) =>
+    api.post('/inventory/material-issue', data),
+  getTransactions: (params?: Record<string, unknown>) =>
+    api.get('/inventory/material-transactions', { params }),
+  getProductStock: (params?: Record<string, unknown>) =>
+    api.get('/inventory/product-stock', { params }),
+  getWarehouses: () => api.get('/inventory/warehouses'),
+  getRawMaterials: () => api.get('/raw-materials'),
+}
+
+// Shipment API
+export const shipmentApi = {
+  getList: (params?: Record<string, unknown>) => api.get('/shipments', { params }),
+  getById: (id: number) => api.get(`/shipments/${id}`),
+  create: (data: Record<string, unknown>) => api.post('/shipments', data),
+  ship: (id: number) => api.post(`/shipments/${id}/ship`),
+  deliver: (id: number) => api.post(`/shipments/${id}/deliver`),
 }
