@@ -24,6 +24,13 @@ from app.models.inventory import (
     Shipment,
     ShipmentDetail,
 )
+from app.models.process_detail import (
+    WashRecord,
+    SaltingRecord,
+    SeasoningRecord,
+    PackagingRecord,
+    PreprocessRecord,
+)
 
 __all__ = [
     "TimestampMixin",
@@ -55,4 +62,9 @@ __all__ = [
     "ProductStock",
     "Shipment",
     "ShipmentDetail",
+    "WashRecord",
+    "SaltingRecord",
+    "SeasoningRecord",
+    "PackagingRecord",
+    "PreprocessRecord",
 ]

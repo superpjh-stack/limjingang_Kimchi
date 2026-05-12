@@ -53,6 +53,7 @@ export interface WorkOrder {
   lot_no?: string
   start_datetime?: string
   end_datetime?: string
+  process_type?: string
 }
 
 export interface ProductionPlanListParams {

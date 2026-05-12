@@ -45,8 +45,19 @@ export default function PopMainPage() {
     startMutation.mutate(id)
   }
 
-  const handleSelect = (id: number) => {
-    router.push(`/pop/${id}`)
+  // 공정유형 → 경로 매핑
+  const PROCESS_ROUTES: Record<string, string> = {
+    'WASHING': 'wash',
+    'SALTING': 'salting',
+    'SEASONING': 'seasoning',
+    'PACKAGING': 'packaging',
+    'FERMENTATION': '',
+    'QC': '',
+  }
+
+  const handleSelect = (id: number, processType?: string) => {
+    const route = processType ? (PROCESS_ROUTES[processType] ?? '') : ''
+    router.push(route ? `/pop/${id}/${route}` : `/pop/${id}`)
   }
 
   return (
@@ -145,7 +156,7 @@ export default function PopMainPage() {
                 key={wo.id}
                 workOrder={wo}
                 onStart={handleStart}
-                onSelect={handleSelect}
+                onSelect={(id, processType) => handleSelect(id, processType)}
               />
             ))}
           </div>

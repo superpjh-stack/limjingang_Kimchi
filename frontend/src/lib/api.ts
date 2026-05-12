@@ -215,6 +215,31 @@ export const coldStorageApi = {
   simulate: () => api.post('/cold-storage/simulate'),
 }
 
+// Process Record API — Sprint 5 공정별 실적
+export const processRecordApi = {
+  createWashRecord: (data: Record<string, unknown>) => api.post('/process-records/wash', data),
+  getWashRecord: (workOrderId: number) => api.get(`/process-records/wash/${workOrderId}`),
+  createSaltingRecord: (data: Record<string, unknown>) => api.post('/process-records/salting', data),
+  getSaltingRecord: (workOrderId: number) => api.get(`/process-records/salting/${workOrderId}`),
+  createSeasoningRecord: (data: Record<string, unknown>) => api.post('/process-records/seasoning', data),
+  getSeasoningRecord: (workOrderId: number) => api.get(`/process-records/seasoning/${workOrderId}`),
+  createPackagingRecord: (data: Record<string, unknown>) => api.post('/process-records/packaging', data),
+  getPackagingRecord: (workOrderId: number) => api.get(`/process-records/packaging/${workOrderId}`),
+  createPreprocessRecord: (data: Record<string, unknown>) => api.post('/process-records/preprocess', data),
+  getSummary: (params: Record<string, unknown>) => api.get('/process-records/summary', { params }),
+  getCcpViolations: (params: Record<string, unknown>) => api.get('/process-records/ccp-violations', { params }),
+}
+
+// AI Agent API — Sprint 5 지능형 분석
+export const aiApi = {
+  getDashboard: () => api.get('/ai/dashboard'),
+  getProductionForecast: () => api.get('/ai/production-forecast'),
+  getMaterialReorder: () => api.get('/ai/material-reorder'),
+  getEquipmentAlerts: () => api.get('/ai/equipment-alerts'),
+  getDefectTrend: () => api.get('/ai/defect-trend'),
+  getDeliveryRisks: () => api.get('/ai/delivery-risks'),
+}
+
 // Admin API — Sprint 4 시스템관리
 export const adminApi = {
   getUsers: (params?: Record<string, unknown>) => api.get('/admin/users', { params }),

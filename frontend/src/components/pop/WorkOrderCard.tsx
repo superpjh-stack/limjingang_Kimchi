@@ -7,7 +7,7 @@ import type { WorkOrder, WorkOrderStatus } from '@/types/production'
 interface WorkOrderCardProps {
   workOrder: WorkOrder
   onStart: (id: number) => void
-  onSelect: (id: number) => void
+  onSelect: (id: number, processType?: string) => void
 }
 
 const statusConfig: Record<
@@ -126,7 +126,7 @@ export default function WorkOrderCard({ workOrder, onStart, onSelect }: WorkOrde
             </button>
           )}
           <button
-            onClick={() => onSelect(workOrder.id)}
+            onClick={() => onSelect(workOrder.id, (workOrder as WorkOrder & { process_type?: string }).process_type)}
             className={cn(
               'flex h-14 items-center justify-center rounded-xl text-base font-bold transition-colors',
               workOrder.status === 'ISSUED'

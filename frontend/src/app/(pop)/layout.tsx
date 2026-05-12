@@ -50,13 +50,19 @@ function PopHeader() {
         </div>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3">
         <div className="text-right">
           <p className="text-xs text-gray-500">{formatDate(now)}</p>
           <p className="font-mono text-lg font-bold tabular-nums text-gray-900">
             {formatTime(now)}
           </p>
         </div>
+        <Link
+          href="/preprocess"
+          className="rounded-lg border border-orange-300 bg-orange-50 px-4 py-2 text-sm font-bold text-orange-700 transition-colors hover:bg-orange-100"
+        >
+          입고전처리
+        </Link>
         <Link
           href="/dashboard"
           className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"

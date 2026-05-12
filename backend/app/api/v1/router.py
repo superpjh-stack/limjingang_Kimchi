@@ -20,6 +20,8 @@ from app.api.v1.endpoints import (
     cold_storage,
     equipment_ext,
     admin,
+    ai_agent,
+    process_detail,
 )
 
 api_router = APIRouter()
@@ -54,3 +56,9 @@ api_router.include_router(equipment_ext.router, prefix="/equipment", tags=["설�
 
 # Sprint 4 - 시스템관리 엔드포인트
 api_router.include_router(admin.router, prefix="/admin", tags=["시스템관리"])
+
+# Sprint 5 - AI Agent 엔드포인트
+api_router.include_router(ai_agent.router, prefix="/ai", tags=["AI Agent"])
+
+# Sprint 5 - 공정별 특화 실적 엔드포인트
+api_router.include_router(process_detail.router, prefix="/process-records", tags=["공정별실적"])
