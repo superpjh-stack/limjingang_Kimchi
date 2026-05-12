@@ -31,6 +31,9 @@ from app.models.process_detail import (
     PackagingRecord,
     PreprocessRecord,
 )
+from app.models.lot_trace import LotTrace
+from app.models.notification import Notification
+from app.models.oee import OeeRecord
 
 __all__ = [
     "TimestampMixin",
@@ -67,4 +70,7 @@ __all__ = [
     "SeasoningRecord",
     "PackagingRecord",
     "PreprocessRecord",
+    "LotTrace",
+    "Notification",
+    "OeeRecord",
 ]

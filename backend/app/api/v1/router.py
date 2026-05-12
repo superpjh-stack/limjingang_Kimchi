@@ -22,6 +22,10 @@ from app.api.v1.endpoints import (
     admin,
     ai_agent,
     process_detail,
+    lot_trace,
+    notifications,
+    oee,
+    reports,
 )
 
 api_router = APIRouter()
@@ -62,3 +66,9 @@ api_router.include_router(ai_agent.router, prefix="/ai", tags=["AI Agent"])
 
 # Sprint 5 - 공정별 특화 실적 엔드포인트
 api_router.include_router(process_detail.router, prefix="/process-records", tags=["공정별실적"])
+
+# Sprint 6 - LOT 추적, 알림, OEE, 보고서 엔드포인트
+api_router.include_router(lot_trace.router, prefix="/lot-trace", tags=["lot-trace"])
+api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
+api_router.include_router(oee.router, prefix="/oee", tags=["oee"])
+api_router.include_router(reports.router, prefix="/reports", tags=["reports"])

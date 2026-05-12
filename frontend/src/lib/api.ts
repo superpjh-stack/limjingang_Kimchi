@@ -259,3 +259,39 @@ export const adminApi = {
   deleteCommonCode: (id: number) => api.delete(`/admin/common-codes/${id}`),
   getCodeGroups: () => api.get('/admin/common-codes/groups'),
 }
+
+// LOT Trace API — Sprint 6
+export const lotTraceApi = {
+  getList: (params?: Record<string, unknown>) => api.get('/lot-trace', { params }),
+  getTimeline: (lotNo: string) => api.get(`/lot-trace/${lotNo}/timeline`),
+  create: (data: Record<string, unknown>) => api.post('/lot-trace', data),
+}
+
+// Notification API — Sprint 6
+export const notificationApi = {
+  getList: (params?: Record<string, unknown>) => api.get('/notifications', { params }),
+  getCount: () => api.get('/notifications/count'),
+  markRead: (id: number) => api.put(`/notifications/${id}/read`),
+  markAllRead: () => api.put('/notifications/read-all'),
+  triggerCheck: () => api.post('/notifications/trigger-check'),
+}
+
+// OEE API — Sprint 6
+export const oeeApi = {
+  getDashboard: () => api.get('/oee/dashboard'),
+  getEquipmentTrend: (equipmentId: number, days = 30) =>
+    api.get(`/oee/equipment/${equipmentId}/trend`, { params: { days } }),
+  calculate: (equipmentId: number, date: string) =>
+    api.post(`/oee/equipment/${equipmentId}/calculate`, null, { params: { date } }),
+  createRecord: (data: Record<string, unknown>) => api.post('/oee/record', data),
+  getRecords: (params?: Record<string, unknown>) => api.get('/oee/records', { params }),
+}
+
+// Report API — Sprint 6
+export const reportApi = {
+  getDaily: (date: string) => api.get('/reports/daily', { params: { date } }),
+  getWeekly: (weekStart: string) => api.get('/reports/weekly', { params: { week_start: weekStart } }),
+  getMonthly: (year: number, month: number) => api.get('/reports/monthly', { params: { year, month } }),
+  exportExcel: (reportType: string, params: Record<string, unknown>) =>
+    api.get('/reports/export/excel', { params: { type: reportType, ...params }, responseType: 'blob' }),
+}

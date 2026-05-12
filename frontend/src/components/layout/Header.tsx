@@ -1,7 +1,8 @@
 'use client'
 
 import React from 'react'
-import { BellIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import NotificationBell from '@/components/layout/NotificationBell'
 
 export default function Header() {
   return (
@@ -19,10 +20,7 @@ export default function Header() {
       {/* 우측 액션 */}
       <div className="flex items-center gap-3">
         {/* 알림 */}
-        <button className="relative rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors">
-          <BellIcon className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-danger" />
-        </button>
+        <NotificationBell />
 
         {/* 날짜 */}
         <div className="text-right">

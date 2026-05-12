@@ -23,6 +23,10 @@ import {
   TruckIcon,
   ShieldCheckIcon,
   ArchiveBoxIcon,
+  MagnifyingGlassCircleIcon,
+  DocumentChartBarIcon,
+  BellIcon,
+  ChartPieIcon,
 } from '@heroicons/react/24/outline'
 
 interface MenuItem {
@@ -111,6 +115,26 @@ const menuItems: MenuItem[] = [
     label: 'AI Agent',
     href: '/ai-agent',
     icon: CpuChipIcon,
+  },
+  {
+    label: 'LOT 추적',
+    href: '/lot-trace',
+    icon: MagnifyingGlassCircleIcon,
+  },
+  {
+    label: 'OEE 분석',
+    href: '/oee',
+    icon: ChartPieIcon,
+  },
+  {
+    label: '생산실적 보고서',
+    href: '/reports',
+    icon: DocumentChartBarIcon,
+  },
+  {
+    label: '알림',
+    href: '/notifications',
+    icon: BellIcon,
   },
   {
     label: '시스템관리',
