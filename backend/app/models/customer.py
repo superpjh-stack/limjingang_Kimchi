@@ -36,59 +36,14 @@ class Customer(Base, TimestampMixin):
         nullable=False,
         comment="고객 유형 (HOMESHOPPING/MART/ONLINE/WHOLESALE/OTHER)",
     )
-    business_number: Mapped[str] = mapped_column(
-        String(20),
-        nullable=True,
-        comment="사업자등록번호",
-    )
-    representative: Mapped[str] = mapped_column(
-        String(100),
-        nullable=True,
-        comment="대표자명",
-    )
-    address: Mapped[str] = mapped_column(
-        String(500),
-        nullable=True,
-        comment="주소",
-    )
-    phone: Mapped[str] = mapped_column(
-        String(20),
-        nullable=True,
-        comment="전화번호",
-    )
-    fax: Mapped[str] = mapped_column(
-        String(20),
-        nullable=True,
-        comment="팩스번호",
-    )
-    contact_person: Mapped[str] = mapped_column(
-        String(100),
-        nullable=True,
-        comment="담당자명",
-    )
-    contact_email: Mapped[str] = mapped_column(
-        String(255),
-        nullable=True,
-        comment="담당자 이메일",
-    )
-    contact_phone: Mapped[str] = mapped_column(
-        String(20),
-        nullable=True,
-        comment="담당자 연락처",
-    )
-    payment_terms: Mapped[str] = mapped_column(
-        String(200),
-        nullable=True,
-        comment="결제 조건",
-    )
-    is_active: Mapped[bool] = mapped_column(
-        Boolean,
-        default=True,
-        nullable=False,
-        comment="활성 여부",
-    )
-    notes: Mapped[str] = mapped_column(
-        String(1000),
-        nullable=True,
-        comment="비고",
-    )
+    business_number: Mapped[str] = mapped_column(String(20), name="business_no", nullable=True)
+    representative: Mapped[str] = mapped_column(String(100), nullable=True)
+    address: Mapped[str] = mapped_column(String(500), nullable=True)
+    phone: Mapped[str] = mapped_column(String(20), nullable=True)
+    fax: Mapped[str] = mapped_column(String(20), nullable=True)
+    contact_person: Mapped[str] = mapped_column(String(100), nullable=True)
+    contact_email: Mapped[str] = mapped_column(String(255), name="email", nullable=True)
+    contact_phone: Mapped[str] = mapped_column(String(20), nullable=True)
+    payment_terms: Mapped[str] = mapped_column(String(200), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    notes: Mapped[str] = mapped_column(String(1000), nullable=True)

@@ -49,7 +49,14 @@ export default api
 
 // Auth API
 export const authApi = {
-  login: (data: LoginRequest) => api.post('/auth/login', data),
+  login: (data: LoginRequest) => {
+    const form = new URLSearchParams()
+    form.append('username', data.username)
+    form.append('password', data.password)
+    return api.post('/auth/login', form, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    })
+  },
   me: () => api.get('/auth/me'),
   logout: () => api.post('/auth/logout'),
 }

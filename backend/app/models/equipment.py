@@ -45,50 +45,12 @@ class Equipment(Base, TimestampMixin):
         nullable=True,
         comment="설비 위치 (작업장)",
     )
-    manufacturer: Mapped[str] = mapped_column(
-        String(200),
-        nullable=True,
-        comment="제조사",
-    )
-    model_number: Mapped[str] = mapped_column(
-        String(100),
-        nullable=True,
-        comment="모델 번호",
-    )
-    purchase_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
-        comment="구매일",
-    )
-    last_maintenance_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
-        comment="최근 점검일",
-    )
-    next_maintenance_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
-        comment="다음 점검 예정일",
-    )
-    status: Mapped[str] = mapped_column(
-        String(20),
-        nullable=False,
-        default="IDLE",
-        comment="현재 상태 (RUNNING/IDLE/MAINTENANCE/BREAKDOWN)",
-    )
-    capacity_per_hour: Mapped[Decimal] = mapped_column(
-        Numeric(10, 3),
-        nullable=True,
-        comment="시간당 처리 용량 (kg/h)",
-    )
-    is_active: Mapped[bool] = mapped_column(
-        Boolean,
-        default=True,
-        nullable=False,
-        comment="활성 여부",
-    )
-    description: Mapped[str] = mapped_column(
-        String(1000),
-        nullable=True,
-        comment="설비 설명",
-    )
+    manufacturer: Mapped[str] = mapped_column(String(200), nullable=True)
+    model_number: Mapped[str] = mapped_column(String(100), name="model_no", nullable=True)
+    purchase_date: Mapped[datetime] = mapped_column(DateTime, name="install_date", nullable=True)
+    last_maintenance_date: Mapped[datetime] = mapped_column(DateTime, name="last_inspect_date", nullable=True)
+    next_maintenance_date: Mapped[datetime] = mapped_column(DateTime, name="next_inspect_date", nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="IDLE")
+    capacity_per_hour: Mapped[Decimal] = mapped_column(Numeric(10, 3), name="capacity", nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    description: Mapped[str] = mapped_column(String(1000), name="notes", nullable=True)

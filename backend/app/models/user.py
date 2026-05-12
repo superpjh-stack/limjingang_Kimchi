@@ -57,60 +57,17 @@ class User(Base, TimestampMixin):
     __tablename__ = "TB_USER"
     __table_args__ = {"comment": "사용자 테이블"}
 
-    username: Mapped[str] = mapped_column(
-        String(50),
-        unique=True,
-        nullable=False,
-        comment="사용자 로그인 아이디",
-    )
-    hashed_password: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False,
-        comment="bcrypt 해시된 비밀번호",
-    )
-    full_name: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False,
-        comment="사용자 실명",
-    )
-    employee_id: Mapped[str] = mapped_column(
-        String(20),
-        unique=True,
-        nullable=True,
-        comment="사원번호",
-    )
-    department: Mapped[str] = mapped_column(
-        String(100),
-        nullable=True,
-        comment="부서명",
-    )
-    position: Mapped[str] = mapped_column(
-        String(100),
-        nullable=True,
-        comment="직책",
-    )
-    email: Mapped[str] = mapped_column(
-        String(255),
-        nullable=True,
-        comment="이메일 주소",
-    )
-    phone: Mapped[str] = mapped_column(
-        String(20),
-        nullable=True,
-        comment="연락처",
-    )
-    is_active: Mapped[bool] = mapped_column(
-        Boolean,
-        default=True,
-        nullable=False,
-        comment="활성 여부",
-    )
-    is_admin: Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
-        nullable=False,
-        comment="관리자 여부",
-    )
+    # DB 실제 컬럼명 매핑: name= 파라미터로 Python 속성명 ↔ DB 컬럼명 분리
+    username: Mapped[str] = mapped_column(String(50), name="user_id", unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), name="password_hash", nullable=False)
+    full_name: Mapped[str] = mapped_column(String(100), name="user_name", nullable=False)
+    employee_id: Mapped[str] = mapped_column(String(20), unique=True, nullable=True)
+    department: Mapped[str] = mapped_column(String(100), nullable=True)
+    position: Mapped[str] = mapped_column(String(100), nullable=True)
+    email: Mapped[str] = mapped_column(String(100), nullable=True)
+    phone: Mapped[str] = mapped_column(String(20), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # 관계
     user_roles: Mapped[list["UserRole"]] = relationship(
