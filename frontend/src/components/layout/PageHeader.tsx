@@ -1,5 +1,5 @@
 import React from 'react'
-import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 interface Breadcrumb {
   label: string
@@ -14,6 +14,14 @@ interface PageHeaderProps {
   className?: string
 }
 
+function ChevronRight() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 6l6 6-6 6"/>
+    </svg>
+  )
+}
+
 export default function PageHeader({
   title,
   subtitle,
@@ -22,30 +30,52 @@ export default function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <div className={cn('mb-6', className)}>
-      {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav className="mb-2 flex items-center gap-1.5 text-xs text-gray-500">
-          {breadcrumbs.map((crumb, index) => (
-            <React.Fragment key={crumb.label}>
-              {index > 0 && <span>/</span>}
-              {crumb.href ? (
-                <a href={crumb.href} className="hover:text-primary transition-colors">
-                  {crumb.label}
-                </a>
-              ) : (
-                <span className="text-gray-700">{crumb.label}</span>
-              )}
-            </React.Fragment>
-          ))}
-        </nav>
-      )}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">{title}</h1>
-          {subtitle && <p className="mt-0.5 text-sm text-gray-500">{subtitle}</p>}
-        </div>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+    <div className={`page-header${className ? ' ' + className : ''}`}>
+      <div>
+        {breadcrumbs && breadcrumbs.length > 0 && (
+          <nav style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
+            {breadcrumbs.map((crumb, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && (
+                  <span style={{ color: 'var(--muted-2)' }}>
+                    <ChevronRight />
+                  </span>
+                )}
+                {crumb.href ? (
+                  <Link
+                    href={crumb.href}
+                    style={{
+                      fontSize: 11.5,
+                      color: i === breadcrumbs.length - 1 ? 'var(--brand)' : 'var(--muted)',
+                      fontWeight: i === breadcrumbs.length - 1 ? 600 : 400,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    {crumb.label}
+                  </Link>
+                ) : (
+                  <span
+                    style={{
+                      fontSize: 11.5,
+                      color: i === breadcrumbs.length - 1 ? 'var(--brand)' : 'var(--muted)',
+                      fontWeight: i === breadcrumbs.length - 1 ? 600 : 400,
+                    }}
+                  >
+                    {crumb.label}
+                  </span>
+                )}
+              </React.Fragment>
+            ))}
+          </nav>
+        )}
+        <h1 className="page-title">{title}</h1>
+        {subtitle && <p className="page-desc">{subtitle}</p>}
       </div>
+      {actions && (
+        <div className="row" style={{ gap: 8 }}>
+          {actions}
+        </div>
+      )}
     </div>
   )
 }

@@ -12,7 +12,7 @@ import type {
 } from '@/types/production'
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -72,13 +72,22 @@ export const productApi = {
     api.get('/products/export', { params, responseType: 'blob' }),
 }
 
-// BOM API
+// BOM API — 백엔드 router prefix 는 /boms (복수형) 입니다.
 export const bomApi = {
-  getList: (params?: Record<string, unknown>) => api.get('/bom', { params }),
-  getById: (id: number) => api.get(`/bom/${id}`),
-  create: (data: Record<string, unknown>) => api.post('/bom', data),
-  update: (id: number, data: Record<string, unknown>) => api.put(`/bom/${id}`, data),
-  delete: (id: number) => api.delete(`/bom/${id}`),
+  getList: (params?: Record<string, unknown>) => api.get('/boms', { params }),
+  getById: (id: number) => api.get(`/boms/${id}`),
+  create: (data: Record<string, unknown>) => api.post('/boms', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/boms/${id}`, data),
+  delete: (id: number) => api.delete(`/boms/${id}`),
+}
+
+// Worker API — 작업자(현장 인력) 마스터
+export const workerApi = {
+  getList: (params?: Record<string, unknown>) => api.get('/workers', { params }),
+  getById: (id: number) => api.get(`/workers/${id}`),
+  create: (data: Record<string, unknown>) => api.post('/workers', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/workers/${id}`, data),
+  delete: (id: number) => api.delete(`/workers/${id}`),
 }
 
 // Customer API
@@ -183,6 +192,15 @@ export const shipmentApi = {
   deliver: (id: number) => api.post(`/shipments/${id}/deliver`),
 }
 
+// Equipment API — 설비 마스터 CRUD
+export const equipmentApi = {
+  getList: (params?: Record<string, unknown>) => api.get('/equipment', { params }),
+  getById: (id: number) => api.get(`/equipment/${id}`),
+  create: (data: Record<string, unknown>) => api.post('/equipment', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/equipment/${id}`, data),
+  delete: (id: number) => api.delete(`/equipment/${id}`),
+}
+
 // Equipment Extended API — Sprint 4 점검/고장 관리
 export const equipmentExtApi = {
   getInspections: (equipmentId: number, params?: Record<string, unknown>) =>
@@ -233,6 +251,7 @@ export const processRecordApi = {
   createPackagingRecord: (data: Record<string, unknown>) => api.post('/process-records/packaging', data),
   getPackagingRecord: (workOrderId: number) => api.get(`/process-records/packaging/${workOrderId}`),
   createPreprocessRecord: (data: Record<string, unknown>) => api.post('/process-records/preprocess', data),
+  getPreprocessRecords: (params: Record<string, unknown>) => api.get('/process-records/preprocess', { params }),
   getSummary: (params: Record<string, unknown>) => api.get('/process-records/summary', { params }),
   getCcpViolations: (params: Record<string, unknown>) => api.get('/process-records/ccp-violations', { params }),
 }
@@ -296,9 +315,41 @@ export const oeeApi = {
 
 // Report API — Sprint 6
 export const reportApi = {
-  getDaily: (date: string) => api.get('/reports/daily', { params: { date } }),
+  getDaily: (date: string) => api.get('/reports/daily', { params: { target_date: date } }),
   getWeekly: (weekStart: string) => api.get('/reports/weekly', { params: { week_start: weekStart } }),
   getMonthly: (year: number, month: number) => api.get('/reports/monthly', { params: { year, month } }),
   exportExcel: (reportType: string, params: Record<string, unknown>) =>
     api.get('/reports/export/excel', { params: { type: reportType, ...params }, responseType: 'blob' }),
+}
+
+// Washing API — 세척 공정 관리
+export const washingApi = {
+  getBatches: (params?: { date?: string; status?: string; material_type?: string }) =>
+    api.get('/washing/batches', { params }),
+  createBatch: (data: Record<string, unknown>) => api.post('/washing/batches', data),
+  getBatch: (id: string) => api.get(`/washing/batches/${id}`),
+  startBatch: (id: string) => api.post(`/washing/batches/${id}/start`),
+  completeBatch: (id: string, data: Record<string, unknown>) =>
+    api.post(`/washing/batches/${id}/complete`, data),
+  holdBatch: (id: string, data: Record<string, unknown>) =>
+    api.post(`/washing/batches/${id}/hold`, data),
+  reportForeignMatter: (id: string, data: Record<string, unknown>) =>
+    api.post(`/washing/batches/${id}/foreign-matter`, data),
+  getForeignMatter: (id: string) => api.get(`/washing/batches/${id}/foreign-matter`),
+  getStandards: () => api.get('/washing/standards'),
+  getDailyStats: (date?: string) => api.get('/washing/stats/daily', { params: { date } }),
+}
+
+// Salting API — 절임 공정 관리
+export const saltingApi = {
+  getBatches: (params?: { date?: string; status?: string }) =>
+    api.get('/salting/batches', { params }),
+  createBatch: (data: Record<string, unknown>) => api.post('/salting/batches', data),
+  getBatch: (id: string) => api.get(`/salting/batches/${id}`),
+  completeBatch: (id: string, data: Record<string, unknown>) =>
+    api.post(`/salting/batches/${id}/complete`, data),
+  recordConcentration: (id: string, data: Record<string, unknown>) =>
+    api.post(`/salting/batches/${id}/concentration`, data),
+  getConcentrationLogs: (id: string) => api.get(`/salting/batches/${id}/concentration`),
+  getDailyStats: (date?: string) => api.get('/salting/stats/daily', { params: { date } }),
 }

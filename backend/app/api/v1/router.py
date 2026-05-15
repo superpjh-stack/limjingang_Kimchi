@@ -26,6 +26,9 @@ from app.api.v1.endpoints import (
     notifications,
     oee,
     reports,
+    workers,
+    washing,
+    salting,
 )
 
 api_router = APIRouter()
@@ -41,6 +44,7 @@ api_router.include_router(processes.router, prefix="/processes", tags=["공정 �
 api_router.include_router(equipment.router, prefix="/equipment", tags=["설비 관리"])
 api_router.include_router(customers.router, prefix="/customers", tags=["고객 관리"])
 api_router.include_router(common_codes.router, prefix="/common-codes", tags=["공통 코드"])
+api_router.include_router(workers.router, prefix="/workers", tags=["작업자 관리"])
 
 # Sprint 2 - 생산 운영 엔드포인트
 api_router.include_router(orders.router, prefix="/orders", tags=["수주관리"])
@@ -72,3 +76,7 @@ api_router.include_router(lot_trace.router, prefix="/lot-trace", tags=["lot-trac
 api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 api_router.include_router(oee.router, prefix="/oee", tags=["oee"])
 api_router.include_router(reports.router, prefix="/reports", tags=["reports"])
+
+# Sprint 7 - 세척/절임 공정 배치 관리 엔드포인트
+api_router.include_router(washing.router, prefix="/washing", tags=["세척공정"])
+api_router.include_router(salting.router, prefix="/salting", tags=["절임공정"])

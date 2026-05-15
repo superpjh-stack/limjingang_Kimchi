@@ -34,6 +34,9 @@ from app.models.process_detail import (
 from app.models.lot_trace import LotTrace
 from app.models.notification import Notification
 from app.models.oee import OeeRecord
+from app.models.worker import Worker
+from app.models.washing import WashingBatch, ForeignMatterLog, WashingStandard
+from app.models.salting import SaltingBatch, SaltingConcentrationLog
 
 __all__ = [
     "TimestampMixin",
@@ -73,4 +76,10 @@ __all__ = [
     "LotTrace",
     "Notification",
     "OeeRecord",
+    "Worker",
+    "WashingBatch",
+    "ForeignMatterLog",
+    "WashingStandard",
+    "SaltingBatch",
+    "SaltingConcentrationLog",
 ]

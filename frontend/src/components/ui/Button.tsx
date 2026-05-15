@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { cn } from '@/lib/utils'
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline'
 type ButtonSize = 'sm' | 'md' | 'lg'
@@ -14,23 +13,26 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
-const variantClasses: Record<ButtonVariant, string> = {
-  primary:
-    'bg-primary text-white hover:bg-primary-600 focus:ring-primary-300 border-transparent',
-  secondary:
-    'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300 border-transparent',
-  danger:
-    'bg-danger text-white hover:bg-danger-600 focus:ring-danger-300 border-transparent',
-  ghost:
-    'bg-transparent text-gray-600 hover:bg-gray-100 focus:ring-gray-200 border-transparent',
-  outline:
-    'bg-white text-primary border-primary hover:bg-primary-50 focus:ring-primary-200',
+const variantClass: Record<ButtonVariant, string> = {
+  primary:   'btn btn-brand',
+  secondary: 'btn',
+  danger:    'btn',
+  ghost:     'btn',
+  outline:   'btn',
 }
 
-const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-xs',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-6 py-3 text-base',
+const variantStyle: Record<ButtonVariant, React.CSSProperties> = {
+  primary:   {},
+  secondary: {},
+  danger:    { background: 'var(--danger)', color: '#fff', borderColor: 'transparent' },
+  ghost:     { background: 'transparent', borderColor: 'transparent', color: 'var(--muted)' },
+  outline:   { background: 'var(--brand-50)', color: 'var(--brand)', borderColor: 'var(--brand-100)' },
+}
+
+const sizeStyle: Record<ButtonSize, React.CSSProperties> = {
+  sm: { padding: '4px 10px', fontSize: '11.5px' },
+  md: {},
+  lg: { padding: '9px 18px', fontSize: '14px' },
 }
 
 export default function Button({
@@ -41,44 +43,23 @@ export default function Button({
   children,
   className,
   disabled,
+  style,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-md border font-medium',
-        'transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1',
-        'disabled:cursor-not-allowed disabled:opacity-50',
-        variantClasses[variant],
-        sizeClasses[size],
-        className
-      )}
+      className={`${variantClass[variant]}${className ? ' ' + className : ''}`}
+      style={{ ...variantStyle[variant], ...sizeStyle[size], ...style }}
       disabled={disabled || loading}
       {...props}
     >
       {loading ? (
-        <svg
-          className="h-4 w-4 animate-spin"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-          />
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+          style={{ animation: 'spin 1s linear infinite' }}>
+          <path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>
         </svg>
       ) : (
-        icon && <span className="flex-shrink-0">{icon}</span>
+        icon && <span style={{ display: 'flex', flexShrink: 0 }}>{icon}</span>
       )}
       {children}
     </button>
