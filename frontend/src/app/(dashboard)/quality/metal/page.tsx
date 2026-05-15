@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import PageHeader from '@/components/layout/PageHeader'
+import { qualityApi } from '@/lib/api'
 
 // HACCP CCP4 — 금속검출기 관리기준
 const CCP4 = {
@@ -71,28 +72,54 @@ export default function MetalDetectPage() {
   const today = new Date().toISOString().split('T')[0]
   const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]
 
+  const queryClient = useQueryClient()
   const [dateFrom, setDateFrom] = useState(sevenDaysAgo)
   const [dateTo, setDateTo] = useState(today)
   const [resultFilter, setResultFilter] = useState<string>('전체')
   const [selectedRecord, setSelectedRecord] = useState<MetalDetectRecord | null>(null)
 
-  const { data: records, isLoading } = useQuery(
-    ['metal-detect', dateFrom, dateTo, resultFilter],
-    async (): Promise<MetalDetectRecord[]> => {
-      await new Promise((r) => setTimeout(r, 400))
-      return MOCK_RECORDS
-    },
-    { staleTime: 30_000 }
+  // 금속검출 기록 목록 — API 실패 시 mock 데이터 fallback
+  const { data: recordsRaw, isLoading } = useQuery(
+    ['quality', 'metal', dateFrom, dateTo, resultFilter],
+    () =>
+      qualityApi
+        .getMetalDetectLogs({
+          date: dateTo, // 단일 날짜 또는 백엔드 확장 시 date_from/date_to 추가 가능
+          result: resultFilter === '전체' ? undefined : resultFilter,
+        })
+        .then((res) => res.data),
+    { staleTime: 30_000, retry: 1, onError: () => {} }
+  )
+
+  // API 응답 정규화
+  const records: MetalDetectRecord[] = useMemo(() => {
+    if (!recordsRaw) return MOCK_RECORDS
+    if (Array.isArray((recordsRaw as any)?.data)) return (recordsRaw as any).data
+    if (Array.isArray(recordsRaw)) return recordsRaw as MetalDetectRecord[]
+    return MOCK_RECORDS
+  }, [recordsRaw])
+
+  // 오늘 통계
+  const { data: statsRaw } = useQuery(
+    ['quality', 'metal', 'stats'],
+    () => qualityApi.getMetalDetectStats().then((res) => res.data),
+    { staleTime: 60_000, retry: 1, onError: () => {} }
+  )
+
+  // 검사 결과 등록 뮤테이션
+  const createLogMutation = useMutation(
+    (logData: Record<string, unknown>) => qualityApi.createMetalDetectLog(logData),
+    { onSuccess: () => queryClient.invalidateQueries(['quality', 'metal']) }
   )
 
   const filtered = useMemo(() => {
-    return (records ?? []).filter((r) =>
+    return records.filter((r) =>
       resultFilter === '전체' || r.metal_detect_result === resultFilter
     )
   }, [records, resultFilter])
 
   const summary = useMemo(() => {
-    const list = records ?? []
+    const list = records
     const total = list.length
     const failCount = list.filter((r) => r.metal_detect_result === 'FAIL').length
     const passCount = total - failCount

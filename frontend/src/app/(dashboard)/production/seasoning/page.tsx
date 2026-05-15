@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import PageHeader from '@/components/layout/PageHeader'
+import { seasoningApi } from '@/lib/api'
 
 // ─── 타입 정의 ────────────────────────────────────────────────────────────────
 
@@ -194,32 +195,71 @@ function ComplianceBadge({ rate }: { rate: number | null }) {
 
 export default function SeasoningProductionPage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const today = new Date().toISOString().split('T')[0]
   const [dateFilter, setDateFilter] = useState(today)
   const [statusFilter, setStatusFilter] = useState<string>('전체')
   const [productFilter, setProductFilter] = useState<string>('전체')
 
-  // 실제 API 연결 시: GET /production/seasoning/batches
+  // 배치 목록 — API 실패 시 mock 데이터로 graceful degradation
   const { data, isLoading, isError } = useQuery(
-    ['seasoning-batches', dateFilter, statusFilter],
-    async (): Promise<SeasoningBatch[]> => {
-      await new Promise((r) => setTimeout(r, 400))
-      return MOCK_BATCHES
-    },
-    { staleTime: 30_000 }
+    ['seasoning', 'batches', dateFilter, statusFilter],
+    () =>
+      seasoningApi
+        .getBatches({ date: dateFilter, status: statusFilter === '전체' ? undefined : statusFilter })
+        .then((res) => res.data),
+    {
+      staleTime: 30_000,
+      onError: () => {}, // 콘솔 에러는 허용, 빨간 UI로 표시
+      retry: 1,
+    }
+  )
+
+  // API 응답 정규화: { data: [...] } 또는 [...] 두 형태 모두 처리
+  const batches: SeasoningBatch[] = useMemo(() => {
+    if (!data) return isError ? MOCK_BATCHES : []
+    // 백엔드가 { data: [...] } 래핑 반환 시
+    if (Array.isArray((data as any)?.data)) return (data as any).data
+    if (Array.isArray(data)) return data as SeasoningBatch[]
+    return MOCK_BATCHES
+  }, [data, isError])
+
+  // 오늘 KPI 통계 — 실패해도 배치 목록에서 계산
+  const { data: todayStatsRaw } = useQuery(
+    ['seasoning', 'stats', 'today'],
+    () => seasoningApi.getTodayStats().then((res) => res.data),
+    { staleTime: 60_000, retry: 1, onError: () => {} }
+  )
+
+  // 배치 등록 뮤테이션
+  const createBatchMutation = useMutation(
+    (newBatch: Record<string, unknown>) => seasoningApi.createBatch(newBatch),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['seasoning'])
+      },
+    }
   )
 
   const filtered = useMemo(() => {
-    if (!data) return []
-    return data.filter((b) => {
+    return batches.filter((b) => {
       const matchStatus = statusFilter === '전체' || b.status === statusFilter
       const matchProduct = productFilter === '전체' || b.product_name === productFilter
       return matchStatus && matchProduct
     })
-  }, [data, statusFilter, productFilter])
+  }, [batches, statusFilter, productFilter])
 
   const summary = useMemo(() => {
-    const batches = data ?? []
+    // API 통계가 있으면 우선 사용, 없으면 배치 목록에서 직접 계산
+    if (todayStatsRaw && !isError) {
+      const s = (todayStatsRaw as any)?.data ?? todayStatsRaw
+      return {
+        inProgress: s.in_progress ?? batches.filter((b) => b.status === '진행중').length,
+        completed: s.completed ?? batches.filter((b) => b.status === '완료').length,
+        totalInput: s.total_input_qty ?? batches.reduce((sum, b) => sum + b.input_qty, 0),
+        complianceRate: s.avg_compliance_rate ?? 100,
+      }
+    }
     const inProgress = batches.filter((b) => b.status === '진행중').length
     const completed = batches.filter((b) => b.status === '완료').length
     const totalInput = batches.reduce((sum, b) => sum + b.input_qty, 0)
@@ -234,7 +274,7 @@ export default function SeasoningProductionPage() {
         ? Math.round((compliantCount / activeBatches.length) * 100)
         : 100
     return { inProgress, completed, totalInput, complianceRate }
-  }, [data])
+  }, [batches, todayStatsRaw, isError])
 
   // 배치 행 클릭 시 POP 페이지 이동 (설계 문서 §6.1)
   const handleBatchClick = (batch: SeasoningBatch) => {

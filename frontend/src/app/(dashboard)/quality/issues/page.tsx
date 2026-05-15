@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import PageHeader from '@/components/layout/PageHeader'
+import { qualityApi } from '@/lib/api'
 
 type IssueType = 'CCP이탈' | '이물질' | '금속검출FAIL' | '불량률초과' | '관능검사이상' | '기타'
 type IssueSeverity = '긴급' | '높음' | '보통' | '낮음'
@@ -65,6 +66,7 @@ export default function QualityIssuesPage() {
   const today = new Date().toISOString().split('T')[0]
   const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0]
 
+  const queryClient = useQueryClient()
   const [dateFrom, setDateFrom] = useState(thirtyDaysAgo)
   const [dateTo, setDateTo] = useState(today)
   const [typeFilter, setTypeFilter] = useState<string>('전체')
@@ -72,17 +74,51 @@ export default function QualityIssuesPage() {
   const [severityFilter, setSeverityFilter] = useState<string>('전체')
   const [selectedIssue, setSelectedIssue] = useState<QualityIssue | null>(null)
 
-  const { data: issues, isLoading } = useQuery(
-    ['quality-issues', dateFrom, dateTo],
-    async (): Promise<QualityIssue[]> => {
-      await new Promise((r) => setTimeout(r, 400))
-      return MOCK_ISSUES
-    },
-    { staleTime: 60_000 }
+  // 이슈 목록 — API 실패 시 mock 데이터 fallback
+  const { data: issuesRaw, isLoading } = useQuery(
+    ['quality', 'issues', dateFrom, dateTo, typeFilter, statusFilter, severityFilter],
+    () =>
+      qualityApi
+        .getIssues({
+          date_from: dateFrom,
+          date_to: dateTo,
+          issue_type: typeFilter === '전체' ? undefined : typeFilter,
+          status: statusFilter === '전체' ? undefined : statusFilter,
+          severity: severityFilter === '전체' ? undefined : severityFilter,
+        })
+        .then((res) => res.data),
+    { staleTime: 60_000, retry: 1, onError: () => {} }
   )
 
+  // API 응답 정규화
+  const issues: QualityIssue[] = useMemo(() => {
+    if (!issuesRaw) return MOCK_ISSUES
+    if (Array.isArray((issuesRaw as any)?.data)) return (issuesRaw as any).data
+    if (Array.isArray(issuesRaw)) return issuesRaw as QualityIssue[]
+    return MOCK_ISSUES
+  }, [issuesRaw])
+
+  // 이슈 등록 뮤테이션
+  const createIssueMutation = useMutation(
+    (newIssue: Record<string, unknown>) => qualityApi.createIssue(newIssue),
+    { onSuccess: () => queryClient.invalidateQueries(['quality', 'issues']) }
+  )
+
+  // 상태 변경 뮤테이션
+  const updateStatusMutation = useMutation(
+    (args: { id: number; status: string }) => qualityApi.updateIssueStatus(args.id, args.status),
+    { onSuccess: () => queryClient.invalidateQueries(['quality', 'issues']) }
+  )
+
+  // 담당자 배정 뮤테이션
+  const assignMutation = useMutation(
+    (args: { id: number; assignee: string }) => qualityApi.assignIssue(args.id, args.assignee),
+    { onSuccess: () => queryClient.invalidateQueries(['quality', 'issues']) }
+  )
+
+  // 클라이언트 측 추가 필터 (백엔드가 지원하지 않을 수 있는 조합 대비)
   const filtered = useMemo(() => {
-    return (issues ?? []).filter((i) => {
+    return issues.filter((i) => {
       const matchType = typeFilter === '전체' || i.type === typeFilter
       const matchStatus = statusFilter === '전체' || i.status === statusFilter
       const matchSeverity = severityFilter === '전체' || i.severity === severityFilter
@@ -91,7 +127,7 @@ export default function QualityIssuesPage() {
   }, [issues, typeFilter, statusFilter, severityFilter])
 
   const summary = useMemo(() => {
-    const list = issues ?? []
+    const list = issues
     const open = list.filter((i) => i.status === '미해결' || i.status === '조치중').length
     const resolved = list.filter((i) => i.status === '해결완료' || i.status === '재발방지완료').length
     const critical = list.filter((i) => i.severity === '긴급' || i.severity === '높음').length

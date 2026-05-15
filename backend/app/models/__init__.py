@@ -37,6 +37,9 @@ from app.models.oee import OeeRecord
 from app.models.worker import Worker
 from app.models.washing import WashingBatch, ForeignMatterLog, WashingStandard
 from app.models.salting import SaltingBatch, SaltingConcentrationLog
+from app.models.quality import MetalDetectLog, QualityIssue
+from app.models.seasoning import SeasoningBatch
+from app.models.packaging import PackagingBatch
 
 __all__ = [
     "TimestampMixin",
@@ -82,4 +85,8 @@ __all__ = [
     "WashingStandard",
     "SaltingBatch",
     "SaltingConcentrationLog",
+    "MetalDetectLog",
+    "QualityIssue",
+    "SeasoningBatch",
+    "PackagingBatch",
 ]

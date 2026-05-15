@@ -322,6 +322,53 @@ export const reportApi = {
     api.get('/reports/export/excel', { params: { type: reportType, ...params }, responseType: 'blob' }),
 }
 
+// Seasoning API — 양념버무림 공정 관리
+export const seasoningApi = {
+  getBatches: (params?: { date?: string; status?: string; product_code?: string }) =>
+    api.get('/seasoning/batches', { params }),
+  createBatch: (data: Record<string, unknown>) => api.post('/seasoning/batches', data),
+  getBatch: (id: number) => api.get(`/seasoning/batches/${id}`),
+  startBatch: (id: number) => api.post(`/seasoning/batches/${id}/start`),
+  completeBatch: (
+    id: number,
+    data: { actual_qty: number; recipe_compliance: number; room_temp: number }
+  ) => api.post(`/seasoning/batches/${id}/complete`, data),
+  getTodayStats: () => api.get('/seasoning/stats/today'),
+}
+
+// Packaging API — 포장 공정 관리
+export const packagingApi = {
+  getBatches: (params?: { date?: string; status?: string; package_type?: string }) =>
+    api.get('/packaging/batches', { params }),
+  createBatch: (data: Record<string, unknown>) => api.post('/packaging/batches', data),
+  getBatch: (id: number) => api.get(`/packaging/batches/${id}`),
+  completeBatch: (id: number, data: { completed_qty: number; defect_qty: number }) =>
+    api.post(`/packaging/batches/${id}/complete`, data),
+  setReadyToShip: (id: number) => api.patch(`/packaging/batches/${id}/ready`, {}),
+  getTodayStats: () => api.get('/packaging/stats/today'),
+}
+
+// Quality API — 품질 이상 관리
+export const qualityApi = {
+  getMetalDetectLogs: (params?: { date?: string; detector_id?: string; result?: string }) =>
+    api.get('/quality/metal-detect', { params }),
+  createMetalDetectLog: (data: Record<string, unknown>) =>
+    api.post('/quality/metal-detect', data),
+  getMetalDetectStats: () => api.get('/quality/metal-detect/stats/today'),
+  getIssues: (params?: {
+    status?: string
+    severity?: string
+    issue_type?: string
+    date_from?: string
+    date_to?: string
+  }) => api.get('/quality/issues', { params }),
+  createIssue: (data: Record<string, unknown>) => api.post('/quality/issues', data),
+  updateIssueStatus: (id: number, status: string) =>
+    api.patch(`/quality/issues/${id}/status`, { status }),
+  assignIssue: (id: number, assignee: string) =>
+    api.patch(`/quality/issues/${id}/assign`, { assigned_to: assignee }),
+}
+
 // Washing API — 세척 공정 관리
 export const washingApi = {
   getBatches: (params?: { date?: string; status?: string; material_type?: string }) =>

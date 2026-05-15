@@ -29,6 +29,9 @@ from app.api.v1.endpoints import (
     workers,
     washing,
     salting,
+    quality,
+    seasoning,
+    packaging,
 )
 
 api_router = APIRouter()
@@ -80,3 +83,10 @@ api_router.include_router(reports.router, prefix="/reports", tags=["reports"])
 # Sprint 7 - 세척/절임 공정 배치 관리 엔드포인트
 api_router.include_router(washing.router, prefix="/washing", tags=["세척공정"])
 api_router.include_router(salting.router, prefix="/salting", tags=["절임공정"])
+
+# Sprint 8 - 품질관리 엔드포인트
+api_router.include_router(quality.router, prefix="/quality", tags=["품질관리"])
+
+# Sprint 8 - 양념버무림/포장출하 공정 배치 관리 엔드포인트
+api_router.include_router(seasoning.router, prefix="/seasoning", tags=["양념버무림공정"])
+api_router.include_router(packaging.router, prefix="/packaging", tags=["포장출하공정"])

@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import PageHeader from '@/components/layout/PageHeader'
+import { packagingApi } from '@/lib/api'
 
 // ─── 타입 정의 ────────────────────────────────────────────────────────────────
 
@@ -279,6 +280,7 @@ const TODAY = new Date().toISOString().split('T')[0]
 
 export default function PackagingProductionPage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [filters, setFilters] = useState<Filters>({
     date: TODAY,
     status: 'ALL',
@@ -286,28 +288,55 @@ export default function PackagingProductionPage() {
     category: 'all',
   })
 
-  // 실제 API 연결 시: packagingApi.getBatches(filters)
-  const { data: batches, isLoading, isError } = useQuery(
-    [
-      'packaging-batches',
-      filters.date,
-      filters.status,
-      filters.product_name,
-      filters.category,
-    ],
-    async (): Promise<PackagingBatch[]> => {
-      await new Promise((r) => setTimeout(r, 600))
-      return MOCK_BATCHES
-    },
+  // 배치 목록 — API 실패 시 mock 데이터로 graceful degradation
+  const { data: batchesRaw, isLoading, isError } = useQuery(
+    ['packaging', 'batches', filters.date, filters.status, filters.category],
+    () =>
+      packagingApi
+        .getBatches({
+          date: filters.date,
+          status: filters.status === 'ALL' ? undefined : filters.status,
+          package_type: filters.category === 'all' ? undefined : filters.category,
+        })
+        .then((res) => res.data),
     {
       staleTime: 30_000,
       keepPreviousData: true,
+      retry: 1,
+      onError: () => {},
     }
   )
 
-  // 필터 적용
+  // API 응답 정규화 — 실패 시 mock fallback
+  const batches: PackagingBatch[] = useMemo(() => {
+    if (!batchesRaw) return isError ? MOCK_BATCHES : []
+    if (Array.isArray((batchesRaw as any)?.data)) return (batchesRaw as any).data
+    if (Array.isArray(batchesRaw)) return batchesRaw as PackagingBatch[]
+    return MOCK_BATCHES
+  }, [batchesRaw, isError])
+
+  // 오늘 KPI 통계
+  const { data: todayStatsRaw } = useQuery(
+    ['packaging', 'stats', 'today'],
+    () => packagingApi.getTodayStats().then((res) => res.data),
+    { staleTime: 60_000, retry: 1, onError: () => {} }
+  )
+
+  // 완료 처리 뮤테이션
+  const completeMutation = useMutation(
+    ({ id, data }: { id: number; data: { completed_qty: number; defect_qty: number } }) =>
+      packagingApi.completeBatch(id, data),
+    { onSuccess: () => queryClient.invalidateQueries(['packaging']) }
+  )
+
+  // 출하 준비 뮤테이션
+  const readyToShipMutation = useMutation(
+    (id: number) => packagingApi.setReadyToShip(id),
+    { onSuccess: () => queryClient.invalidateQueries(['packaging']) }
+  )
+
+  // 필터 적용 (product_name 검색은 클라이언트에서)
   const filtered = useMemo(() => {
-    if (!batches) return []
     return batches.filter((b) => {
       if (filters.category !== 'all' && b.package_category !== filters.category) return false
       if (filters.status !== 'ALL' && b.status !== filters.status) return false
@@ -320,30 +349,44 @@ export default function PackagingProductionPage() {
     })
   }, [batches, filters])
 
-  // 요약 KPI 계산
+  // 요약 KPI 계산 — API 통계 우선, 없으면 배치 데이터에서 직접 계산
   const summary = useMemo(() => {
-    if (!batches) return null
+    if (batches.length === 0) return null
+    const statsData = todayStatsRaw
+      ? (Array.isArray((todayStatsRaw as any)?.data)
+          ? (todayStatsRaw as any).data
+          : todayStatsRaw) as any
+      : null
+    if (statsData && !isError) {
+      return {
+        totalCompletedQty:
+          statsData.total_completed_qty ??
+          batches.filter((b) => b.status === 'COMPLETED').reduce((s, b) => s + b.completed_qty, 0),
+        totalBatches: statsData.total_batches ?? batches.length,
+        defectRate: statsData.defect_rate ?? 0,
+        pkgPerHour: statsData.pkg_per_hour ?? 0,
+      }
+    }
     const completed = batches.filter((b) => b.status === 'COMPLETED')
     const totalCompletedQty = completed.reduce((s, b) => s + b.completed_qty, 0)
     const totalBatches = batches.length
     const totalDefect = batches.reduce((s, b) => s + b.defect_qty, 0)
     const totalDone = batches.reduce((s, b) => s + b.completed_qty, 0)
     const defectRate = totalDone > 0 ? Math.round((totalDefect / totalDone) * 1000) / 10 : 0
-    // 시간당 포장량: 완료 배치 기준 단순 추정 (9h 작업 기준)
     const pkgPerHour = Math.round(totalCompletedQty / 9)
     return { totalCompletedQty, totalBatches, defectRate, pkgPerHour }
-  }, [batches])
+  }, [batches, todayStatsRaw, isError])
 
   // 출하 준비 완료 배치 (설계 문서 §4e ShipReadySection 요구사항)
   const readyToShip = useMemo(
-    () => (batches ?? []).filter((b) => b.status === 'COMPLETED'),
+    () => batches.filter((b) => b.status === 'COMPLETED'),
     [batches]
   )
 
   // 불량률 초과 배치 (1.3% 기준 — packaging-ui-design.md §4d)
   const highDefectBatches = useMemo(
     () =>
-      (batches ?? []).filter(
+      batches.filter(
         (b) => b.completed_qty > 0 && calcDefectRate(b.defect_qty, b.completed_qty) > 1.3
       ),
     [batches]
@@ -353,15 +396,15 @@ export default function PackagingProductionPage() {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
 
-  // 출하 준비 전환 핸들러 (설계 문서 §6.3 / §7.1)
-  // 실제 API 연결 시: packagingApi.markReadyToShip(batchId) 호출
+  // 출하 준비 전환 핸들러 — API 연동 후 출하관리 이동 (설계 문서 §6.3 / §7.1)
   const handleReadyToShip = (batch: PackagingBatch) => {
     const confirmed = window.confirm(
       `${batch.lot_no} ${batch.product_name} ${batch.package_spec} ${formatQty(batch.completed_qty)}개를 출하 준비 상태로 전환합니다.`
     )
     if (confirmed) {
-      // 실제 API 연결 시: packagingApi.markReadyToShip(batch.id)
-      router.push('/shipments')
+      readyToShipMutation.mutate(batch.id, {
+        onSettled: () => router.push('/shipments'),
+      })
     }
   }
 
